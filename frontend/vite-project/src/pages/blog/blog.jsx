@@ -15,6 +15,16 @@ const BlogCRUD = () => {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [uploading, setUploading] = useState(false);
+  
+  // Estados para el modal de imagen
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalImage, setModalImage] = useState("");
+  const [imageInfo, setImageInfo] = useState({ width: 0, height: 0 });
+  const [imageScale, setImageScale] = useState(1);
+  const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [showHint, setShowHint] = useState(true);
 
   const fetchBlogs = async () => {
     try {
@@ -41,6 +51,139 @@ const BlogCRUD = () => {
     fetchBlogs();
   }, []);
 
+  // Función para abrir el modal de imagen
+  const openImageModal = (imageSrc) => {
+    setModalImage(imageSrc);
+    setIsModalOpen(true);
+    setImageScale(1);
+    setImagePosition({ x: 0, y: 0 });
+    setShowHint(true);
+    document.body.style.overflow = 'hidden'; // Prevenir scroll del body
+    
+    // Obtener información de la imagen
+    const img = new Image();
+    img.onload = () => {
+      setImageInfo({ width: img.naturalWidth, height: img.naturalHeight });
+    };
+    img.src = imageSrc;
+    
+    // Ocultar hint después de 5 segundos
+    setTimeout(() => setShowHint(false), 100);
+  };
+
+  // Función para cerrar el modal de imagen
+  const closeImageModal = () => {
+    setIsModalOpen(false);
+    setModalImage("");
+    setImageInfo({ width: 0, height: 0 });
+    setImageScale(1);
+    setImagePosition({ x: 0, y: 0 });
+    setIsDragging(false);
+    setShowHint(true);
+    document.body.style.overflow = 'unset'; // Restaurar scroll del body
+  };
+
+  // Función para cambiar el zoom de la imagen
+  const changeImageScale = (newScale) => {
+    const clampedScale = Math.max(0.5, Math.min(3, newScale));
+    setImageScale(clampedScale);
+    
+    // Si volvemos a escala 1, centrar la imagen
+    if (clampedScale === 1) {
+      setImagePosition({ x: 0, y: 0 });
+    }
+  };
+
+  // Funciones para el drag/pan de la imagen
+  const handleMouseDown = (e) => {
+    if (imageScale > 1) {
+      setIsDragging(true);
+      setDragStart({
+        x: e.clientX - imagePosition.x,
+        y: e.clientY - imagePosition.y
+      });
+      setShowHint(false);
+    }
+  };
+
+  const handleMouseMove = (e) => {
+    if (isDragging && imageScale > 1) {
+      setImagePosition({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  // Navegación con teclado
+  const handleKeyDown = (e) => {
+    if (!isModalOpen) return;
+    
+    const step = 50;
+    switch (e.key) {
+      case 'ArrowLeft':
+        e.preventDefault();
+        setImagePosition(prev => ({ ...prev, x: prev.x + step }));
+        setShowHint(false);
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        setImagePosition(prev => ({ ...prev, x: prev.x - step }));
+        setShowHint(false);
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setImagePosition(prev => ({ ...prev, y: prev.y + step }));
+        setShowHint(false);
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        setImagePosition(prev => ({ ...prev, y: prev.y - step }));
+        setShowHint(false);
+        break;
+      case '+':
+      case '=':
+        e.preventDefault();
+        changeImageScale(imageScale + 0.25);
+        break;
+      case '-':
+        e.preventDefault();
+        changeImageScale(imageScale - 0.25);
+        break;
+      case '0':
+        e.preventDefault();
+        changeImageScale(1);
+        break;
+    }
+  };
+
+  // Cerrar modal con tecla Escape y manejar navegación con teclado
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.key === 'Escape' && isModalOpen) {
+        closeImageModal();
+      } else {
+        handleKeyDown(e);
+      }
+    };
+
+    if (isModalOpen) {
+      document.addEventListener('keydown', handleKeyPress);
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      
+      return () => {
+        document.removeEventListener('keydown', handleKeyPress);
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isModalOpen, isDragging, dragStart, imagePosition, imageScale]);
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -60,7 +203,7 @@ const BlogCRUD = () => {
       return handleEdit(e);
     }
 
-    if (!title || !content) {
+    if (!title || !content || !image) {
       toast.error("Por favor completa los campos requeridos");
       return;
     }
@@ -297,20 +440,12 @@ const BlogCRUD = () => {
         ) : (
           blogs.map((blog) => (
             <div key={blog._id} className="blog-item">
-              <div className="blog-content">
-                <h4 className="blog-title">{blog.title}</h4>
-                <p className="blog-excerpt">{truncateText(blog.content, 100)}</p>
-                <div className="blog-date">
-                  {new Date(blog.createdAt).toLocaleDateString('es-ES', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </div>
-              </div>
-              
               {blog.image && blog.image.trim() !== "" && (
-                <div className="blog-image">
+                <div 
+                  className="blog-image"
+                  onClick={() => openImageModal(blog.image)}
+                  title="Hacer clic para ver en pantalla completa"
+                >
                   <img 
                     src={blog.image} 
                     alt={blog.title} 
@@ -323,6 +458,18 @@ const BlogCRUD = () => {
                 </div>
               )}
               
+              <div className="blog-content">
+                <h4 className="blog-title">{blog.title}</h4>
+                <p className="blog-excerpt">{truncateText(blog.content, 100)}</p>
+                <div className="blog-date">
+                  {new Date(blog.createdAt).toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </div>
+              </div>
+              
               <div className="blog-actions">
                 <button className="btn-secondary" onClick={() => updateBlog(blog)}>
                   Editar
@@ -334,6 +481,73 @@ const BlogCRUD = () => {
             </div>
           ))
         )}
+      </div>
+      
+      {/* Modal para imagen en pantalla completa */}
+      <div 
+        className={`image-modal ${isModalOpen ? 'active' : ''}`}
+        onClick={closeImageModal}
+      >
+        <div className="image-modal-content" onClick={(e) => e.stopPropagation()}>
+          <button className="image-modal-close" onClick={closeImageModal}>
+            ×
+          </button>
+          
+          <div className={`navigation-hint ${!showHint ? 'hide' : ''}`}>
+            Arrastra para mover • Flechas para navegar • +/- para zoom
+          </div>
+          
+          {modalImage && (
+            <>
+              <div 
+                className={`image-container ${isDragging ? 'dragging' : ''} ${imageScale > 1 ? 'zoomed' : ''}`}
+                onMouseDown={handleMouseDown}
+              >
+                <img 
+                  src={modalImage} 
+                  alt="Imagen en pantalla completa"
+                  style={{ 
+                    transform: `scale(${imageScale}) translate(${imagePosition.x / imageScale}px, ${imagePosition.y / imageScale}px)`,
+                    transition: isDragging ? 'none' : 'transform 0.1s ease-out'
+                  }}
+                  draggable={false}
+                />
+              </div>
+              
+              {imageInfo.width > 0 && (
+                <div className="image-info">
+                  {imageInfo.width} × {imageInfo.height}px
+                  {imageScale !== 1 && ` • Zoom: ${Math.round(imageScale * 100)}%`}
+                  {imageScale > 1 && ` • Arrastra para mover`}
+                </div>
+              )}
+              
+              <div className="image-controls">
+                <button 
+                  className="image-control-btn"
+                  onClick={() => changeImageScale(imageScale - 0.25)}
+                  title="Alejar (tecla -)"
+                >
+                  −
+                </button>
+                <button 
+                  className="image-control-btn"
+                  onClick={() => changeImageScale(1)}
+                  title="Tamaño original (tecla 0)"
+                >
+                  ⌂
+                </button>
+                <button 
+                  className="image-control-btn"
+                  onClick={() => changeImageScale(imageScale + 0.25)}
+                  title="Acercar (tecla +)"
+                >
+                  +
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </div>
       
       <Toaster 

@@ -242,10 +242,9 @@ button:disabled {
   overflow: hidden;
   border: 1px solid #e2e8f0;
   transition: all 0.3s ease;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 20px;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .blog-item:hover {
@@ -254,12 +253,75 @@ button:disabled {
   border-left: 4px solid #ec6ead;
 }
 
+/* Imagen del blog - proporción más cuadrada */
+.blog-image {
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+}
+
+.blog-image::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0);
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+.blog-image:hover::before {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.blog-image::after {
+  content: '⛶';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: white;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 2;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.blog-image:hover::after {
+  opacity: 1;
+  transform: scale(1.05);
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.blog-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.blog-item:hover .blog-image img {
+  transform: scale(1.02);
+}
+
+/* Contenido del blog - ahora debajo de la imagen */
 .blog-content {
   padding: 25px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  grid-column: span 2;
+  flex-grow: 1;
 }
 
 .blog-title {
@@ -267,48 +329,269 @@ button:disabled {
   font-weight: 600;
   color: #2d3748;
   margin: 0;
+  line-height: 1.4;
 }
 
 .blog-excerpt {
   color: #4a5568;
   line-height: 1.6;
   margin: 0;
+  flex-grow: 1;
 }
 
 .blog-date {
   color: #718096;
   font-size: 13px;
-  margin-top: 5px;
+  margin-top: auto;
   font-style: italic;
+  padding-top: 10px;
 }
 
-.blog-image {
-  width: 180px;
-  height: 180px;
-  grid-row: 1;
-  grid-column: 2;
-  padding-right: 25px;
-  padding-top: 25px;
-}
-
-.blog-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
+/* Acciones del blog - siempre al final */
 .blog-actions {
   display: flex;
   gap: 10px;
-  grid-column: span 2;
   padding: 0 25px 25px 25px;
+  margin-top: auto;
 }
 
 .blog-actions button {
   padding: 10px 16px;
   flex: 1;
+}
+
+/* Variante para blogs sin imagen */
+.blog-item.no-image .blog-content {
+  padding-top: 25px;
+}
+
+/* Modal para imagen en pantalla completa */
+.image-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.image-modal.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.image-modal-content {
+  position: relative;
+  max-width: 95%;
+  max-height: 95%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  transform: scale(0.8);
+  transition: transform 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-modal.active .image-modal-content {
+  transform: scale(1);
+}
+
+.image-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: grab;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-container.dragging {
+  cursor: grabbing;
+}
+
+.image-container.zoomed {
+  cursor: grab;
+}
+
+.image-modal img {
+  display: block;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  
+  /* Tamaño mínimo para imágenes pequeñas */
+  min-width: 600px;
+  min-height: 400px;
+  
+  /* Tamaño máximo para imágenes grandes */
+  max-width: 90vw;
+  max-height: 90vh;
+  
+  /* Mantener proporción pero permitir agrandamiento */
+  object-fit: contain;
+  
+  /* Para imágenes muy pequeñas, permitir pixelado controlado */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  
+  /* Transición suave para el movimiento */
+  transition: transform 0.1s ease-out;
+  
+  /* Evitar selección */
+  user-select: none;
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+}
+
+/* Información de resolución */
+.image-info {
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.8;
+  backdrop-filter: blur(10px);
+  z-index: 1002;
+}
+
+.image-modal-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transition: all 0.3s ease;
+  z-index: 1003;
+  backdrop-filter: blur(10px);
+}
+
+.image-modal-close:hover {
+  background: rgba(0, 0, 0, 0.9);
+  transform: scale(1.1);
+}
+
+/* Controles adicionales del modal */
+.image-controls {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  display: flex;
+  gap: 8px;
+  z-index: 1002;
+}
+
+.image-control-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.image-control-btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+  transform: scale(1.05);
+}
+
+/* Instrucciones de navegación */
+.navigation-hint {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(10px);
+  z-index: 1002;
+}
+
+.image-modal.active .navigation-hint {
+  opacity: 0.4;
+}
+
+.navigation-hint.hide {
+  opacity: 0;
+}
+
+/* Responsividad para el modal */
+@media (max-width: 768px) {
+  .image-modal img {
+    min-width: 280px;
+    min-height: 200px;
+    max-width: 95vw;
+    max-height: 85vh;
+  }
+  
+  .image-info {
+    font-size: 11px;
+    padding: 6px 8px;
+  }
+  
+  .image-controls {
+    bottom: 10px;
+    right: 10px;
+  }
+  
+  .image-control-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+  
+  .navigation-hint {
+    font-size: 10px;
+    padding: 6px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .image-modal img {
+    min-width: 250px;
+    min-height: 180px;
+  }
+  
+  .navigation-hint {
+    display: none;
+  }
 }
 
 /* Animaciones */
@@ -327,23 +610,34 @@ button:disabled {
     padding: 20px;
   }
   
-  .blog-item {
-    grid-template-columns: 1fr;
+  .blog-image {
+    height: 150px;
   }
   
   .blog-content {
-    grid-column: 1;
-  }
-  
-  .blog-image {
-    grid-column: 1;
-    grid-row: 2;
-    width: 100%;
-    height: auto;
-    padding: 0 25px;
+    padding: 20px;
   }
   
   .blog-actions {
-    grid-row: 3;
+    padding: 0 20px 20px 20px;
+    flex-direction: column;
+  }
+  
+  .blog-actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .blog-image {
+    height: 140px;
+  }
+  
+  .blog-content {
+    padding: 15px;
+  }
+  
+  .blog-actions {
+    padding: 0 15px 15px 15px;
   }
 }
