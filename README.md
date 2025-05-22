@@ -21,3 +21,8 @@ CLOUDINARY_API_ENVIRONMENT="CLOUDINARY_URL=cloudinary://641951968281765:9NlzmIIe
 SEGUNDA COSA IMPORTANTE, segun nos dijo, la fecha de entrega era hasta hoy todo el dia, lo entregue justamente antes de las 12 de la medianoche, literal todos los commits despues de eso es porque soy perfeccionista y no lo queria dejar asi como esta
 
 YYYYY TERCEROOOOOOO, todos los commits de antes de la entrega de la tarea (el correo) basicamente ya tienen los 3 cruds funcionales y un par de cositas mas, pero como dije en el punto anterior, quiero hacerle unos retoques pequeños, pero ya no me alcanzaba el tiempo, gracias por su comprension.
+
+
+!!IMPORTANTISIMOOO
+
+pasa resulta y acontece que por el sueño, se me revolvieron las cosas y ahora por alguna razonb tengo la rama main y master en un mismo repo, pero todo lo necesario esta en master, asi me aparecia en git bash, pero al parecer en github la rama principal era main, semejante despapaye se me armo, perdon profe
