@@ -1,0 +1,207 @@
+/* Reset básico para toda la aplicación */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Estilos base del body */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f3f4f6;
+}
+
+/* Contenedor principal de la aplicación */
+.app-container {
+  min-height: 100vh;
+  background-color: #f3f4f6;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Gradiente morado en la parte superior */
+.top-gradient {
+  height: 8px;
+  background: linear-gradient(to right, #3b82f6, #9333ea);
+  width: 100%;
+  flex-shrink: 0; /* No se encoge */
+}
+
+/* Contenido principal */
+.main-content {
+  flex: 1; /* Ocupa todo el espacio restante */
+  width: 100%;
+}
+
+/* Estilos globales para botones */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Estilos globales para enlaces */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+a:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Utilidades de texto */
+strong {
+  font-weight: 600;
+}
+
+/* Scrollbar personalizado para webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+/* Estilos para elementos de formulario */
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Clase utilitaria para ocultar elementos visualmente pero mantenerlos accesibles */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Animación de fade-in para transiciones */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive para tablets */
+@media (max-width: 1024px) {
+  .app-container {
+    background-color: #f9fafb;
+  }
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+  .app-container {
+    min-height: 100vh;
+  }
+  
+  .top-gradient {
+    height: 6px;
+  }
+  
+  /* Ajustar espaciado en móviles */
+  .main-content {
+    padding: 0;
+  }
+}
+
+/* Para dispositivos muy pequeños */
+@media (max-width: 480px) {
+  body {
+    font-size: 14px;
+  }
+  
+  .top-gradient {
+    height: 4px;
+  }
+}
+
+/* Estilos para el modo oscuro (opcional, para futuro) */
+@media (prefers-color-scheme: dark) {
+  /* Puedes agregar estilos de modo oscuro aquí más adelante */
+}
+
+/* Clase para centrar contenido */
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Clases utilitarias comunes */
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.hidden {
+  display: none;
+}
+
+.visible {
+  display: block;
+}
+
+/* Espaciado común */
+.mb-1 { margin-bottom: 0.25rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-3 { margin-bottom: 0.75rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-5 { margin-bottom: 1.25rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+
+.mt-1 { margin-top: 0.25rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-3 { margin-top: 0.75rem; }
+.mt-4 { margin-top: 1rem; }
+.mt-5 { margin-top: 1.25rem; }
+.mt-6 { margin-top: 1.5rem; }

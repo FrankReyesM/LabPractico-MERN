@@ -1,0 +1,44 @@
+.navbar {
+  background-color: white;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 30px;
+  padding: 12px 24px;
+}
+
+.navbar-container {
+  display: flex;
+  gap: 32px;
+}
+
+.navbar-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #6b7280;
+  text-decoration: none; /* Para que no se subrayen los enlaces */
+}
+
+.navbar-tab:hover {
+  color: #111827;
+  background-color: #f9fafb;
+  text-decoration: none; /* Mantener sin subrayado en hover */
+}
+
+.navbar-tab-active {
+  background-color: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+
+.navbar-tab-active:hover {
+  background-color: #eff6ff;
+  color: #2563eb;
+  text-decoration: none;
+}
